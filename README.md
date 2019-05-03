@@ -1,2 +1,0 @@
-# FormikTable
-Created with CodeSandbox
