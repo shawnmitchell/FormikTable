@@ -1,14 +1,6 @@
 import React from "react";
 import ReactDataSheet from "react-datasheet";
-import {
-  Formik,
-  Form,
-  FieldArray,
-  Field,
-  FieldProps,
-  getIn,
-  FieldArrayRenderProps
-} from "formik";
+import { Formik, Form, FieldArray, Field, FieldProps, getIn } from "formik";
 import * as yup from "yup";
 import {
   Table,
@@ -18,11 +10,9 @@ import {
   TableHead,
   TextField,
   Select,
-  FormControl,
-  InputLabel,
   Input,
   MenuItem,
-  FormHelperText
+  Checkbox
 } from "@material-ui/core";
 import DatePicker from "react-datepicker";
 
@@ -35,10 +25,12 @@ interface GridElement extends ReactDataSheet.Cell<GridElement, number> {
   value: number;
 }
 
-class MyReactDataSheet extends ReactDataSheet<GridElement, number> {}
+const MyCheckbox = ({ field }: FieldProps) => {
+  const { value, ...rest } = field;
+  return <Checkbox checked={field.value} {...rest} color="primary" />;
+};
 
 const MyDatePicker = ({ field, form }: FieldProps) => {
-  const errorMessage = getIn(form.errors, field.name);
   return (
     <DatePicker
       {...field}
@@ -62,7 +54,6 @@ const MyTextField = ({ field, form }: FieldProps) => {
 };
 
 const MySelect = ({ field, form }: FieldProps) => {
-  const errorMessage = getIn(form.errors, field.name);
   return (
     <Select {...field} input={<Input name="age" id="age-helper" />}>
       <MenuItem value={1}>One</MenuItem>
@@ -73,13 +64,13 @@ const MySelect = ({ field, form }: FieldProps) => {
   );
 };
 
-const MyForm = (props: IMyFormProps) => {
-  const [data, setData] = React.useState(
+const MyForm = () => {
+  const [data] = React.useState(
     [
-      [{ value: 1 }, { value: 2 }, { value: Date.now() }],
-      [{ value: 4 }, { value: 4 }, { value: Date.now() }],
-      [{ value: 7 }, { value: 3 }, { value: Date.now() }],
-      [{ value: 10 }, { value: 1 }, { value: Date.now() }]
+      [{ value: true }, { value: 1 }, { value: 2 }, { value: Date.now() }],
+      [{ value: true }, { value: 4 }, { value: 4 }, { value: Date.now() }],
+      [{ value: true }, { value: 7 }, { value: 3 }, { value: Date.now() }],
+      [{ value: true }, { value: 10 }, { value: 1 }, { value: Date.now() }]
     ].reduce((obj: {}, curr, i) => {
       return { ...obj, [`row${i}`]: curr };
     }, {})
@@ -113,6 +104,7 @@ const MyForm = (props: IMyFormProps) => {
             <Table>
               <TableHead>
                 <TableRow key={"header"}>
+                  <TableCell>Enabled</TableCell>
                   <TableCell>ABC</TableCell>
                   <TableCell>DEF</TableCell>
                   <TableCell>GHI</TableCell>
@@ -128,21 +120,27 @@ const MyForm = (props: IMyFormProps) => {
                             <TableCell key={`${name}[0]`}>
                               <Field
                                 name={`${name}[0].value`}
-                                component={MyTextField}
+                                component={MyCheckbox}
                               />
                             </TableCell>
                             <TableCell key={`${name}[1]`}>
                               <Field
                                 name={`${name}[1].value`}
-                                component={MySelect}
+                                component={MyTextField}
                               />
                             </TableCell>
                             <TableCell key={`${name}[2]`}>
                               <Field
                                 name={`${name}[2].value`}
+                                component={MySelect}
+                              />
+                            </TableCell>
+                            <TableCell key={`${name}[3]`}>
+                              <Field
+                                name={`${name}[3].value`}
                                 component={MyDatePicker}
                               />
-                            </TableCell>{" "}
+                            </TableCell>
                             {/* {values[name].map((value, index) => (
                               <TableCell key={`${name}[${index}]`}>
                                   <Field
