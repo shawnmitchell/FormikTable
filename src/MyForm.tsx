@@ -72,9 +72,11 @@ const MyForm = (props: IMyFormProps) => {
           <Form>
             <Table>
               <TableHead>
-                <TableCell>ABC</TableCell>
-                <TableCell>DEF</TableCell>
-                <TableCell>GHI</TableCell>
+                <TableRow key={"header"}>
+                  <TableCell>ABC</TableCell>
+                  <TableCell>DEF</TableCell>
+                  <TableCell>GHI</TableCell>
+                </TableRow>
               </TableHead>
               <TableBody>
                 {Object.keys(values).map(key => {
