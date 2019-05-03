@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDataSheet from "react-datasheet";
-import "react-datasheet/lib/react-datasheet.css";
 import {
   Formik,
   Form,
@@ -17,8 +16,18 @@ import {
   TableRow,
   TableBody,
   TableHead,
-  TextField
+  TextField,
+  Select,
+  FormControl,
+  InputLabel,
+  Input,
+  MenuItem,
+  FormHelperText
 } from "@material-ui/core";
+import DatePicker from "react-datepicker";
+
+import "react-datasheet/lib/react-datasheet.css";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface IMyFormProps {}
 
@@ -28,18 +37,49 @@ interface GridElement extends ReactDataSheet.Cell<GridElement, number> {
 
 class MyReactDataSheet extends ReactDataSheet<GridElement, number> {}
 
+const MyDatePicker = ({ field, form }: FieldProps) => {
+  const errorMessage = getIn(form.errors, field.name);
+  return (
+    <DatePicker
+      {...field}
+      selected={field.value}
+      onChange={value => form.setFieldValue(field.name, value)}
+      customInput={
+        <TextField
+          id="standard-helperText"
+          InputProps={{
+            readOnly: true
+          }}
+        />
+      }
+    />
+  );
+};
+
 const MyTextField = ({ field, form }: FieldProps) => {
   const errorMessage = getIn(form.errors, field.name);
   return <TextField label={errorMessage} error={!!errorMessage} {...field} />;
 };
 
+const MySelect = ({ field, form }: FieldProps) => {
+  const errorMessage = getIn(form.errors, field.name);
+  return (
+    <Select {...field} input={<Input name="age" id="age-helper" />}>
+      <MenuItem value={1}>One</MenuItem>
+      <MenuItem value={2}>Two</MenuItem>
+      <MenuItem value={3}>Three</MenuItem>
+      <MenuItem value={4}>Four</MenuItem>
+    </Select>
+  );
+};
+
 const MyForm = (props: IMyFormProps) => {
   const [data, setData] = React.useState(
     [
-      [{ value: 1 }, { value: 2 }, { value: 3 }],
-      [{ value: 4 }, { value: 5 }, { value: 6 }],
-      [{ value: 7 }, { value: 8 }, { value: 9 }],
-      [{ value: 10 }, { value: 11 }, { value: 12 }]
+      [{ value: 1 }, { value: 2 }, { value: Date.now() }],
+      [{ value: 4 }, { value: 4 }, { value: Date.now() }],
+      [{ value: 7 }, { value: 3 }, { value: Date.now() }],
+      [{ value: 10 }, { value: 1 }, { value: Date.now() }]
     ].reduce((obj: {}, curr, i) => {
       return { ...obj, [`row${i}`]: curr };
     }, {})
@@ -85,14 +125,32 @@ const MyForm = (props: IMyFormProps) => {
                       {({ name }) => {
                         return (
                           <TableRow key={name}>
-                            {values[name].map((value, index) => (
+                            <TableCell key={`${name}[0]`}>
+                              <Field
+                                name={`${name}[0].value`}
+                                component={MyTextField}
+                              />
+                            </TableCell>
+                            <TableCell key={`${name}[1]`}>
+                              <Field
+                                name={`${name}[1].value`}
+                                component={MySelect}
+                              />
+                            </TableCell>
+                            <TableCell key={`${name}[2]`}>
+                              <Field
+                                name={`${name}[2].value`}
+                                component={MyDatePicker}
+                              />
+                            </TableCell>{" "}
+                            {/* {values[name].map((value, index) => (
                               <TableCell key={`${name}[${index}]`}>
-                                <Field
+                                  <Field
                                   name={`${name}[${index}].value`}
                                   component={MyTextField}
                                 />
-                              </TableCell>
-                            ))}
+                                 </TableCell>
+                               ))} */}
                           </TableRow>
                         );
                       }}
