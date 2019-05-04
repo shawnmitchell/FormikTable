@@ -1,6 +1,5 @@
-import React from "react";
-import ReactDataSheet from "react-datasheet";
-import { Formik, Form, FieldArray, Field, FieldProps, getIn } from "formik";
+import React, { ReactElement } from "react";
+import { Formik, Form, FieldArray, Field } from "formik";
 import * as yup from "yup";
 import {
   Table,
@@ -8,73 +7,33 @@ import {
   TableRow,
   TableBody,
   TableHead,
-  TextField,
-  Select,
-  Input,
-  MenuItem,
-  Checkbox
+  Grid,
+  Paper,
+  Button
 } from "@material-ui/core";
-import DatePicker from "react-datepicker";
-
+import {
+  MyCheckbox,
+  MyDatePicker,
+  MySelect,
+  MyTextField
+} from "./FormComponents";
 import "react-datasheet/lib/react-datasheet.css";
 import "react-datepicker/dist/react-datepicker.css";
 
-interface IMyFormProps {}
+export const MyContainer: React.SFC<ReactElement> = ({ children }) => {
+  return (
+    <Grid container direction="row" justify="center" alignItems="center">
+      <Paper>{children}</Paper>
+    </Grid>
+  );
+};
 
-interface GridElement extends ReactDataSheet.Cell<GridElement, number> {
-  value: number;
+interface IMyForm {
+  data: Array<Array<{ value: boolean | number | Date }>>;
+  handleSubmit: ({}) => void;
 }
 
-const MyCheckbox = ({ field }: FieldProps) => {
-  const { value, ...rest } = field;
-  return <Checkbox checked={field.value} {...rest} color="primary" />;
-};
-
-const MyDatePicker = ({ field, form }: FieldProps) => {
-  return (
-    <DatePicker
-      {...field}
-      selected={field.value}
-      onChange={value => form.setFieldValue(field.name, value)}
-      customInput={
-        <TextField
-          id="standard-helperText"
-          InputProps={{
-            readOnly: true
-          }}
-        />
-      }
-    />
-  );
-};
-
-const MyTextField = ({ field, form }: FieldProps) => {
-  const errorMessage = getIn(form.errors, field.name);
-  return <TextField label={errorMessage} error={!!errorMessage} {...field} />;
-};
-
-const MySelect = ({ field, form }: FieldProps) => {
-  return (
-    <Select {...field} input={<Input name="age" id="age-helper" />}>
-      <MenuItem value={1}>One</MenuItem>
-      <MenuItem value={2}>Two</MenuItem>
-      <MenuItem value={3}>Three</MenuItem>
-      <MenuItem value={4}>Four</MenuItem>
-    </Select>
-  );
-};
-
-const MyForm = () => {
-  const [data] = React.useState(
-    [
-      [{ value: true }, { value: 1 }, { value: 2 }, { value: Date.now() }],
-      [{ value: true }, { value: 4 }, { value: 4 }, { value: Date.now() }],
-      [{ value: true }, { value: 7 }, { value: 3 }, { value: Date.now() }],
-      [{ value: true }, { value: 10 }, { value: 1 }, { value: Date.now() }]
-    ].reduce((obj: {}, curr, i) => {
-      return { ...obj, [`row${i}`]: curr };
-    }, {})
-  );
+export const MyForm: React.SFC<IMyForm> = ({ data, handleSubmit }) => {
   const x = Object.keys(data).reduce((acc, row) => {
     return {
       ...acc,
@@ -93,8 +52,10 @@ const MyForm = () => {
 
   return (
     <Formik
-      initialValues={data}
-      onSubmit={() => {}}
+      initialValues={data.reduce((obj: {}, curr, i) => {
+        return { ...obj, [`row${i}`]: curr };
+      }, {})}
+      onSubmit={handleSubmit}
       validateOnBlur
       validationSchema={yup.object().shape(x)}
     >
@@ -157,11 +118,10 @@ const MyForm = () => {
                 })}
               </TableBody>
             </Table>
+            <Button type="submit">Submit</Button>
           </Form>
         );
       }}
     </Formik>
   );
 };
-
-export default MyForm;
